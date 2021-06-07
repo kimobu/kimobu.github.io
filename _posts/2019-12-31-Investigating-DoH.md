@@ -1,3 +1,9 @@
+---
+title: Investigating DoH
+date: 2019-12-31
+categories: [research, networking]
+tags: [networking, research, school, doh, dns]
+---
 # DNS Security
 As a plain-text protocol, DNS lacks Confidentiality, Integrity, and Availability (CIA) protections. An attacker who can observe DNS activity can see where the DNS request originated from, where responses came from, what the query and response were, or tamper with the response.
 

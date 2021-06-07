@@ -1,3 +1,9 @@
+---
+title: Converting DoH to DNS
+date: 2021-01-06
+categories: [research, networking]
+tags: [research, school, dns, doh, networking]     # TAG names should always be lowercase
+---
 In a [previous post]({% post_url 2019-12-31-Investigating-DoH %}) I wrote about investigations
 that I performed on DNS over HTTPS (DoH). That research was performed as part of
 [Cyber Security Research](https://catalog.dsu.edu/preview_course_nopop.php?catoid=32&coid=20604). During

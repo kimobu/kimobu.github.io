@@ -1,4 +1,9 @@
-# Hacking a Computer Remotely through a Phone
+---
+title: Hacking a Computer Remotely through a Phone
+date: 2021-05-01
+categories: [research, offsec]
+tags: [research, offsec, kali]
+---
 In a recent demonstration of cyber and electronic warfare capabilities, I had the opportunity to enable access into a network by exploiting a computer remotely through a cell phone. In this blog post, I’ll document some of the challenges that were encountered and how they were overcome.
 # Scenario
 The scenario for this demonstration was: an offensive cyber operations team wants to gain access into a targeted computer network which includes a wireless access point. The targeted network is firewalled and NAT’d, and social engineering techniques such as spear phishing have been unsuccessful. In order to gain access into the network, a human source is used to approach the facility that houses the network (think a residential building) and gains close enough proximity to sense the radio frequency (RF) emissions from the facility.

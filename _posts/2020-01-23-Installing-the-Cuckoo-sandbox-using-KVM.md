@@ -1,3 +1,9 @@
+---
+title: Installing the Cuckoo Sandbox Using KVM
+date: 2020-01-23
+categories: []
+tags: [homelab]
+---
 The [Cuckoo](https://cuckoosandbox.org) project provides a safe environment in which to execute malware (also called "detonating"). I will be using Cuckoo as part of a malware analysis class. There are [several](https://www.cybrary.it/blog/0p3n/cuckoo-installation-guide-malware-sandboxing/) [guides](https://medium.com/@sainadhjamalpur/build-your-own-cuckoo-sandbox-installation-guide-3fc44b03a622) [that](http://www.sanjaysaha.info/blog/installation-of-cuckoo-sandbox-in-windows-10/) [you](https://tom-churchill.blogspot.com/2017/08/setting-up-cuckoo-sandbox-step-by-step.html) could follow to setup Cuckoo, but almost all of the ones that I found used VirtualBox as a hypervisor. Since I have a homelab running on KVM, I wanted to install Cuckoo to use that as well. There is no groundbreaking information in this post, but it consolidates information that I had to find from several different sources while troubleshooting.
 
 The overall steps that this post covers are:
