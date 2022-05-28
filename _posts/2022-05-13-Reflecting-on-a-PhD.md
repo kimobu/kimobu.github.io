@@ -72,7 +72,7 @@ DSU has some very knowledgable faculty. As always, I “clicked” with some pro
 
 I think the future still looks bright for incoming students. DSU recently established a public-private partnership in SD to build a new research park in Sioux Falls. In addition to the existing Applied Research Labs, there will be ample opportunities to work on cyber security problems across a range of specialities, including IoT, medical devices, and malware. 
 
-[1]:	todo
+[1]:	https://scholar.dsu.edu/theses/381/
 [2]:	https://dsu.edu/programs/phdco/index.html
 [3]:	https://www.cve.org
 [4]:	http://dangerousprototypes.com/docs/Bus_Pirate
