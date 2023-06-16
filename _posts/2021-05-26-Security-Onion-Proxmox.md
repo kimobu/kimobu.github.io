@@ -45,3 +45,64 @@ link/ether 70:85:c2:d0:e3:22 brd ff:ff:ff:ff:ff:ff
 link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
 ```
 Running `tcpdump` on vmbr0v20 showed a copy of my traffic, so I knew that the data was making it "up" from the pfsense VM to the hypervisor, it just wasn't making it to the tap interface that was attached to the Security Onion VM. These devices can be further enumerated with `brctl show`. Looking at the help for brctl, there's a setageing option. Matching that to [this page](https://www.vanpolen.biz/posts/extending-home-lab-security-onion/), I tried setting that to 0 with `brctl setageing vmbr0v20 0`. I could now see all the traffic in my Security Onion VM 🙂
+
+## Tuning
+Last is getting rid of some of my non-lab traffic that might get picked up by the promiscuous sniffing. 
+
+```
+vim /opt/so/saltstack/local/pillar/global.sls
+steno:
+  bpf:
+    - not udp port 5353 &&
+    - not net 10.10.10.0/24 &&
+    - not net 10.10.30.0/24
+nids:
+  bpf:
+    - not udp port 5353 &&
+    - not net 10.10.10.0/24 &&
+    - not net 10.10.30.0/24
+zeek:
+  bpf:
+    - not udp port 5353 &&
+    - not net 10.10.10.0/24 &&
+    - not net 10.10.30.0/24
+```
+
+# Updated configuration 2023-06-13
+After making some changes to my homelab I had to reconfigure this setup. Here's a simplified guide for setups where Security Onion and the guest network are on the same Proxmox host.
+
+## Step 1: Create a Linux VLAN
+Proxmox node -> System -> Network -> Create -> Linux VLAN
+Name: vmbr0.XX where XX is your VLAN tag
+Vlan raw device: vmbr0
+
+## Step 2: Create a Linux Brdige
+Proxmox node -> System -> Network -> Create -> Linux Bridge
+Name: vmbr1
+Bridge ports: vmbr0.XX
+
+## Step 3: Modify VM hardware
+pfSense: Edit the Network Device used for the span.
+Bridge: vmbr1
+VLAN Tag: XX
+
+Security Onion: Edit the Network Device used for the tap.
+Bridge: vmbr1
+VLAN Tag: XX
+
+## Step 4: Set ageing
+`brctl setageing vmbr1 0`
+
+`/etc/network/interfaces` should look like this:
+```
+auto vmbr0.45
+iface vmbr0.45 inet manual
+
+auto vmbr1
+iface vmbr1 inet manual
+  bridge-ports vmbr0.45
+  bridge-stp off
+  bridge-fd 0
+  bridge-vlan-aware yes
+  bridge-vids 2-4094
+  ```
