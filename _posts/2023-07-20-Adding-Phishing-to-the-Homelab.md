@@ -1,36 +1,41 @@
 ---
-title: Setting up a macOS Homelab
-date: 2022-11-20
+title: Putting phishing data into Security Onion
+date: 2023-07-20
 categories: []
 tags: [homelab]
 ---
+I wanted to add some phishing scenarios to my hunting homelab. I'm more concerned with being able to hunt on malicious emails than on stopping them, so [DMARC, DKIM, and SPF](https://www.cloudflare.com/learning/email-security/dmarc-dkim-spf/) are out of scope. If you have an offensive lens, you'll want to look at something like [this](https://www.securesystems.de/blog/building-a-red-team-infrastructure-in-2023/) for an effective phishing set up.
+
+Let's look at two areas: external mail where phishing comes from and internal mail where phishes will be received.
 
 # External mail
+We need some infrastructure set up to send email. First is Postfix, a mail server. We can send email using a command line, but we might want to compose emails graphically, so we'll install an IMAP server (dovecot) and a webmail server (Roundcube).
+
 ## Postfix
-https://orcacore.com/install-postfix-mail-server-ubuntu-22-04/
+[This guide](https://orcacore.com/install-postfix-mail-server-ubuntu-22-04/) was pretty solid to get Postfix up and running. To support SMTPS we'll need a certificate:
 
 ```
 openssl req -newkey rsa:2048 -keyout /etc/ssl/private/mail-kvps.key.enc -x509 -days 365 -out mail-kvps.crt
 openssl rsa -in /etc/ssl/private/mail-kvps.key.enc -out /etc/ssl/private/mail-kvps.key
 ```
 
-Postfix main.cf
+Here's an example Postfix configuration file `main.cf`. Comments are inline.
 ```
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 biff = no
 append_dot_mydomain = no
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
-mydestination = mail.kvps.local, localhost.kvps.local, localhost
+mydestination = mail.kvps.local, localhost.kvps.local, localhost  # What domains to receive mail for
 relayhost =
-mynetworks = 127.0.0.0/8 10.10.41.0/24
+mynetworks = 127.0.0.0/8 10.10.41.0/24  # What networks to relay mail from
 inet_interfaces = all
 recipient_delimiter = +
 compatibility_level = 2
 myorigin = /etc/mailname
 mailbox_size_limit = 0
 inet_protocols = ipv4
-home_mailbox = Maildir/
+home_mailbox = Maildir/  # In the user's homedir, where should mail be stored
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 smtpd_sasl_local_domain =
@@ -41,23 +46,23 @@ smtpd_sasl_auth_enable = yes
 smtp_tls_security_level = may
 smtpd_tls_security_level = may
 smtp_tls_note_starttls_offer = yes
-smtpd_tls_key_file = /etc/ssl/private/mail-kvps.key
-smtpd_tls_cert_file = /etc/ssl/certs/mail-kvps.crt
+smtpd_tls_key_file = /etc/ssl/private/mail-kvps.key  # TLS key from openssl above
+smtpd_tls_cert_file = /etc/ssl/certs/mail-kvps.crt   # TlS cert from openssl above
 smtpd_tls_loglevel = 4
 smtpd_tls_received_header = yes
-myhostname = mail.kvps.local
+myhostname = mail.kvps.local  # Who are we
 smtpd_tls_auth_only = no
 tls_random_source = dev:/dev/urandom
 ```
 
 ## Dovecot
-https://ubuntu.com/server/docs/mail-dovecot
+The dovecot install is [straight forward](https://ubuntu.com/server/docs/mail-dovecot). 
 
-10-mail.conf
+In `10-mail.conf` we set the mail_location to match Postfix:
 ```
 mail_location = maildir:~/Maildir
 ```
-10-master.conf
+Then in `10-master.conf` we set the auth on unix_listener:
 ```
 unix_listener /var/spool/postfix/private/auth {
 	mode = 0666
@@ -66,10 +71,15 @@ unix_listener /var/spool/postfix/private/auth {
   }
 ```
 
-## Roundcube
-https://github.com/roundcube/roundcubemail/wiki/Installation
+In `/etc/dovecot/users` we can add in email addresses, passwords, and user maildirs:
+```
+admin@paypai-support.com:{PLAIN}abc123:1001:1001::/home/vmail::userdb_mail=maildir:~/Maildir/paypai-support.com/admin
+```
 
-config.inc.php
+## Roundcube
+Lastly install [Roundcube](https://github.com/roundcube/roundcubemail/wiki/Installation).
+
+In `config.inc.php` we configure the following:
 ```
 $config['db_dsnw'] = 'mysql://USERNAME:PASSWORD@localhost/DATABASE';
 $config['imap_host'] = 'localhost:143';
@@ -82,12 +92,16 @@ $config['spellcheck_engine'] = 'enchant';
 ```
 
 # Internal mail
+Next is internal email. The lab is Active Directory based, so I use Exchange.
+
 ## Exchange
-Windows Server 2019 Standard
-Add 64Gb drive. Install to D:\exchange
+Pull the Windows Server 2019 Standard ISO from the Microsoft EvalCenter and the Exchange 2019 ISO from (here)[https://www.microsoft.com/en-us/download/details.aspx?id=104131].
+In my server (VM) I added a 100Gb drive and installed Exchange to it in D:\exchange.
+
+Once installed, configure the Exchange server to do nothing with malicious emails.
 
 # DNS
-named.conf.local
+Now to send emails from External to Internal, we need to set up some DNS MX entries. On a container I run bind and configure the following in `named.conf.local`:
 ```
 zone "kvps.local" {
 	type master;
@@ -105,7 +119,7 @@ zone "blue.local" {
 };
 ```
 
-db.kvps.local
+Then in `db.kvps.local` we set up records for the external mail server:
 ```
 $TTL    604800
 @       IN      SOA     kvps.local. root.kvps.local. (
@@ -123,7 +137,7 @@ ns      IN      A       10.10.41.103
 mail    IN      A       10.10.41.102
 ```
 
-db.blue.local
+And in `db.blue.local` we set up records for the internal mail server:
 ```
 $TTL    604800
 @       IN      SOA     blue.local. root.blue.local. (
@@ -141,7 +155,7 @@ ns      IN      A       10.10.41.103
 mail    IN      A       10.10.41.100
 ```
 
-db.10
+Finally we create reverse zone records for the lab in `db.10`:
 ```
 $TTL    604800
 @       IN      SOA     ns.kvps.local. root.ns.kvps.local. (
@@ -174,32 +188,42 @@ ns      IN      A       10.10.41.103
 103.10.10       IN      PTR     ns.blue.local.
 ```
 
+We can test that email gets sent with telnet:
+```
+telnet mail.blue.local 25
 MAIL FROM:<newsletter@contoso.com>
-RCPT TO:<pam.beasley@blue.local>
+RCPT TO:<victim@blue.local>
 DATA
 Subject: Test from Contoso
 This is a test message
+```
 
 # Security Onion
-### Zeek
+Now that we can send and receive email, lets add some data to Security Onion.
+
+## Zeek
+Zeek has plugins that let you parse email messages. One I included was smtp-url-analysis, which will extract links from email and track whether those links were visited. To add this to Security Onion's Zeek container, we do:
+```
 mkdir -p /opt/so/saltstack/local/salt/zeek/policy/custom
 cd /tmp
 git clone https://github.com/initconf/smtp-url-analysis.git
 mv smtp-url-analysis/scripts/ /opt/so/saltstack/local/salt/zeek/policy/custom/
+```
+Then we configure `/opt/so/saltstack/local/pillar/minions/$SENSORNAME_$ROLE.sls`:
 ```
 zeek:
   local:
     '@load':
       - custom/smtp_url/scripts
 ```
-### Filebeat
-./local/pillar/zeeklogs.sls
+## Filebeat
+Once Zeek is configured, we need Filebeat to pull in the dataset by adding the following to  `/opt/so/saltstack/local/pillar/zeeklogs.sls`:
 ```
 	- smtpurl_links
 ```
-### Elasticsearch
+## Elasticsearch
+Finally, we need to parse data out of the Zeek logs via an Elasticsearch ingest pipeline. Create a file at `/opt/so/saltstack/local/salt/elasticsearch/files/ingest/smtp_urls` with:
 ```
-/opt/so/saltstack/local/salt/elasticsearch/files/ingest/
  {
 	"description" : "zeek.smtpurl_links",
 	"processors" : [
