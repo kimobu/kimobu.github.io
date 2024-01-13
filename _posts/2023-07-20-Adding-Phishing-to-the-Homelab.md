@@ -95,7 +95,7 @@ $config['spellcheck_engine'] = 'enchant';
 Next is internal email. The lab is Active Directory based, so I use Exchange.
 
 ## Exchange
-Pull the Windows Server 2019 Standard ISO from the Microsoft EvalCenter and the Exchange 2019 ISO from (here)[https://www.microsoft.com/en-us/download/details.aspx?id=104131].
+Pull the Windows Server 2019 Standard ISO from the Microsoft EvalCenter and the Exchange 2019 ISO from [here](https://www.microsoft.com/en-us/download/details.aspx?id=104131).
 In my server (VM) I added a 100Gb drive and installed Exchange to it in D:\exchange.
 
 Once installed, configure the Exchange server to do nothing with malicious emails.
