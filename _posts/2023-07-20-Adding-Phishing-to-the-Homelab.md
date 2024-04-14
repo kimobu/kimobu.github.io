@@ -200,8 +200,8 @@ This is a test message
 
 # Security Onion
 Now that we can send and receive email, lets add some data to Security Onion.
-
-## Zeek
+## Security Onion 2.3
+### Zeek
 Zeek has plugins that let you parse email messages. One I included was smtp-url-analysis, which will extract links from email and track whether those links were visited. To add this to Security Onion's Zeek container, we do:
 ```
 mkdir -p /opt/so/saltstack/local/salt/zeek/policy/custom
@@ -216,12 +216,12 @@ zeek:
     '@load':
       - custom/smtp_url/scripts
 ```
-## Filebeat
+### Filebeat
 Once Zeek is configured, we need Filebeat to pull in the dataset by adding the following to  `/opt/so/saltstack/local/pillar/zeeklogs.sls`:
 ```
 	- smtpurl_links
 ```
-## Elasticsearch
+### Elasticsearch
 Finally, we need to parse data out of the Zeek logs via an Elasticsearch ingest pipeline. Create a file at `/opt/so/saltstack/local/salt/elasticsearch/files/ingest/smtp_urls` with:
 ```
  {
@@ -235,3 +235,21 @@ Finally, we need to parse data out of the Zeek logs via an Elasticsearch ingest 
 	]
   }
 ```
+
+## Security Onion 2.4
+SO2.4 has changed how some things are configured.
+### Zeek
+We still pull this down as previously:
+```
+mkdir -p /opt/so/saltstack/local/salt/zeek/policy/custom
+cd /tmp
+git clone https://github.com/initconf/smtp-url-analysis.git
+mv smtp-url-analysis/scripts/ /opt/so/saltstack/local/salt/zeek/policy/custom/
+```
+Then in SOC, navigate to Configuration -> zeek -> config -> local -> load. For your node, add `custom/scripts` as a script to be loaded.
+
+### Elastic Fleet
+The Elastic Agent/Fleet replace Filebeat. The Fleet pulls the logs from `/nsm/zeek/logs/current/*.log` and uses an exclude list. We do not need to change anything here.
+
+### Elasticsearch
+This should be mostly the same. I used the name zeek.smtpurl_links to conform with the `zeek-logs` agent policy.

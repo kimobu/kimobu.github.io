@@ -3,12 +3,14 @@ title: About
 icon: fas fa-info
 order: 4
 ---
-I am a cyber security engineer and researcher. 
+I am a cyber security engineer and researcher. I like animals, nature, cooking, and early 2000's emo.
 
 # Career Overview
-- **Senior Security Engineer**, Amazon (Jun. 2021)
+- **MTS, Staff Security Engineer**, OpenAI (Feb. 2024)
+- **Adjunct Lecturer**, Johns Hopkins University (Aug. 2023)
+- **Senior Security Engineer**, Amazon (Jun. 2021 to Feb. 2024)
 - **Cyber Warfare Officer**, Maryland Air National Guard (Apr. 2015)
-- **Cyber Security Engineer**, Carnegie Mellon University, Software Engineering Institute (Feb. 2017 to Jun. 2021)
+- **MTS, Cyber Security Engineer**, Carnegie Mellon University, Software Engineering Institute (Feb. 2017 to Jun. 2021)
 - **Cyber Operations Engineer**, Chiron Technology Services (Sep. 2012 to Feb. 2017)
 - **Operator**, US Army (Sep. 2004 to Sep. 2012)
 
