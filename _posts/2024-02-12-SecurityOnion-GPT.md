@@ -82,7 +82,7 @@ Verifying that Jupyter and Elasticsearch can communicate:
 es.info()
 ```
 
-    ObjectApiResponse({'name': 'securityonion', 'cluster_name': 'securityonion', 'cluster_uuid': 'WVA9WFJETpCLgQPeLtGk1A', 'version': {'number': '8.10.4', 'build_flavor': 'default', 'build_type': 'docker', 'build_hash': 'b4a62ac808e886ff032700c391f45f1408b2538c', 'build_date': '2023-10-11T22:04:35.506990650Z', 'build_snapshot': False, 'lucene_version': '9.7.0', 'minimum_wire_compatibility_version': '7.17.0', 'minimum_index_compatibility_version': '7.0.0'}, 'tagline': 'You Know, for Search'})
+   > ObjectApiResponse({'name': 'securityonion', 'cluster_name': 'securityonion', 'cluster_uuid': 'WVA9WFJETpCLgQPeLtGk1A', 'version': {'number': '8.10.4', 'build_flavor': 'default', 'build_type': 'docker', 'build_hash': 'b4a62ac808e886ff032700c391f45f1408b2538c', 'build_date': '2023-10-11T22:04:35.506990650Z', 'build_snapshot': False, 'lucene_version': '9.7.0', 'minimum_wire_compatibility_version': '7.17.0', 'minimum_index_compatibility_version': '7.0.0'}, 'tagline': 'You Know, for Search'})
 
 
 
@@ -630,7 +630,7 @@ compressed_assistant = CompressibleAgent(
 )
 ```
 
-    INFO:autogen.token_count_utils:gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.
+  >  INFO:autogen.token_count_utils:gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.
 
 At this point, Roberto can prompt the RAG agent on different MITRE ATT&CK groups. Lets try asking about the pre-ransomware activity that was found:
 
@@ -655,7 +655,7 @@ ragproxyagent.initiate_chat(compressed_assistant, problem=qa_problem)
     Deleting VSS can be a common tactic used by threat actors involved in activities such as ransomware attacks, where they aim to prevent victims from restoring their files from backup copies. It can also be used to hide the presence of malicious files or activities on the system by removing potential traces.
     As a cyber security analyst, it is important to investigate further, analyze the impact of the VSS deletion, and take appropriate actions to mitigate further risks. This may include conducting a thorough system analysis, monitoring for any additional suspicious activities, and implementing security measures to prevent future unauthorized access.
     ...
-    [33massistant[0m (to ragproxyagent):
+    assistant (to ragproxyagent):
     Based on the provided activity, the threat actor is attempting to delete Volume Shadow Copies (VSS) on the system.
     --------------------------------------------------------------------------------
 
@@ -672,7 +672,7 @@ ragproxyagent.initiate_chat(compressed_assistant, problem=qa_problem)
 >  
     User's question is: What ransomware focused threat actors delete volume shadow copies?
     ...
-    [33massistant[0m (to ragproxyagent):    
+    assistant (to ragproxyagent):
     EXOTIC LILY, Wizard Spider
     --------------------------------------------------------------------------------
 
@@ -697,7 +697,7 @@ ragproxyagent.initiate_chat(compressed_assistant, problem=qa_problem)
 
 >    User's question is: What commands does Lazarus Group use to delete volume shadow copies?
     ...
-    [33massistant[0m (to ragproxyagent):
+    assistant (to ragproxyagent):
     The Lazarus Group does not use specific commands to delete volume shadow copies.
     --------------------------------------------------------------------------------
 
